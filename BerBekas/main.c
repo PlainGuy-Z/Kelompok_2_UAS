@@ -1,4 +1,4 @@
-#include "berbekas.h"
+#include "fungsi.h"
 
 int main() {
     int pilihan;
