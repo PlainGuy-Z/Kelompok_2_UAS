@@ -14,3 +14,21 @@ int main() {
             continue;
         }
         getchar();
+        
+        switch (pilihan) {
+            case 1:
+                loginMenu();
+                break;
+            case 2:
+                registerUser();
+                break;
+            case 3:
+                printf("---- Terima kasih telah menggunakan aplikasi ini ----\n\n");
+                break;
+            default:
+                printf("Pilihan tidak valid.\n");
+        }
+    } while (pilihan != 3);
+
+    return 0;
+}
