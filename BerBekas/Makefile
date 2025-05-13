@@ -1,2 +1,2 @@
 all:
-	gcc -Wall main_berbekas.c berbekas.c -o main
+	gcc main.c fungsi.c -o main
