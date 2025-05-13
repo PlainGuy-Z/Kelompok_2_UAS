@@ -65,4 +65,32 @@ int partition(Node arr[], int low, int high);
 void quickSort(Node arr[], int low, int high);
 void filterHarga();
 
+void merge(Node arr[], int left, int mid, int right);
+void mergeSort(Node arr[], int left, int right);
+void filterTahun();
+
+void beliBarang();
+
+void tambahKeKeranjang();
+void tampilkanKeranjang();
+void prosesKeranjang();
+void masukkanHistory(const char *nama, int harga, int tahun, const char *penjual);
+//============================ END BUY MENU ============================
+
+//riwayat transaksi stack
+void transactionHistoryMenu();
+
+// Menu Pencarian dan Sorting (BST, Quick, Merge)
+void cariBerdasarkanNama();
+void cariBerdasarkanHarga();
+void urutkanHargaQuickSort();
+void urutkanTahunMergeSort();
+void tampilkanHargaTertinggiTerendah();
+void searchMenu();
+
+// Menu Akun yang udah dibuat(opsional karena gk ada dilaporan)
+
+void lihat_profil(User *currentUser);
+void lihat_laporan_keuntungan(const char* username);
+void accountMenu(User* currentUser);
 #endif
