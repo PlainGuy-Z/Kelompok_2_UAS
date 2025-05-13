@@ -364,3 +364,188 @@ void swap(Node *a, Node *b) {
     *b = temp; 
 }
 // end fungsi untuk filter harga di case 2
+
+void urutkanHargaQuickSort() {
+    Node *temp = head;
+    int count = 0;
+
+    while (temp != NULL) {
+        count++;
+        temp = temp->next;
+    }
+
+    if (count == 0) {
+        printf("Tidak ada barang.\n");
+        return;
+    }
+
+    Node array[count];
+    temp = head;
+    for (int i = 0; i < count; i++) {
+        array[i] = *temp;
+        temp = temp->next;
+    }
+
+    quickSort(array, 0, count - 1);
+
+    printf("\n--- Barang Diurutkan Berdasarkan Harga (Tinggi ke Rendah) ---\n");
+    for (int i = 0; i < count; i++) {
+        printf("%d. Nama    : %s\n", i + 1, array[i].nama);
+        printf("  Harga    : Rp%d\n", array[i].harga);
+        printf("  Tahun    : %d\n", array[i].tahun);
+        printf("  Penjual  : %s\n", array[i].pemilik);
+        printf("-------------------------\n");
+    }
+}
+
+void urutkanTahunMergeSort() {
+    Node *temp = head;
+    int count = 0;
+
+    while (temp != NULL) {
+        count++;
+        temp = temp->next;
+    }
+
+    if (count == 0) {
+        printf("Tidak ada barang.\n");
+        return;
+    }
+
+    Node array[count];
+    temp = head;
+    for (int i = 0; i < count; i++) {
+        array[i] = *temp;
+        temp = temp->next;
+    }
+
+    mergeSort(array, 0, count - 1);
+
+    printf("\n--- Barang Diurutkan Berdasarkan Tahun (Terlama ke Terbaru) ---\n");
+    for (int i = 0; i < count; i++) {
+        printf("%d. Nama     : %s\n", i + 1, array[i].nama);
+        printf(" Harga      : Rp%d\n", array[i].harga);
+        printf(" Tahun      : %d\n", array[i].tahun);
+        printf(" Penjual    : %s\n", array[i].pemilik);
+        printf("-------------------------\n");
+    }
+}
+
+void tampilkanHargaTertinggiTerendah() {
+    if (head == NULL) {
+        printf("Tidak ada barang.\n");
+        return;
+    }
+
+    Node *temp = head;
+    Node *maxNode = head;
+    Node *minNode = head;
+
+    while (temp != NULL) {
+        if (temp->harga > maxNode->harga) maxNode = temp;
+        if (temp->harga < minNode->harga) minNode = temp;
+        temp = temp->next;
+    }
+
+    printf("\nHarga Tertinggi:\n");
+    printf("Nama    : %s\n", maxNode->nama);
+    printf("Harga   : Rp%d\n", maxNode->harga);
+    printf("Tahun   : %d\n", maxNode->tahun);
+    printf("Penjual : %s\n", maxNode->pemilik);
+
+    printf("\nHarga Terendah:\n");
+    printf("Nama    : %s\n", minNode->nama);
+    printf("Harga   : Rp%d\n", minNode->harga);
+    printf("Tahun   : %d\n", minNode->tahun);
+    printf("Penjual : %s\n", minNode->pemilik);
+}
+// ======================= END Menu Pencarian & Sort (BST, Quick, Merge) ========================
+
+
+void lihat_profil(User* currentUser) {
+    printf("\n--- Profil Pengguna ---\n");
+    printf("Username : %s\n", currentUser->username);
+}
+
+void lihat_laporan_keuntungan(const char* username){
+    printf("\n--- Laporan Keuntungan ---\n");
+    printf("Penjual %s telah mendapatkan total Rp.0 (fitur simulasi)\n", username);
+}
+
+void accountMenu(User* currentUser)  {
+    int pilihan;
+    do {
+        printf("\n=== Akun Saya ===\n");
+        printf("1. Lihat Profil\n");
+        printf("2. Lihat Laporan Keuntungan\n");
+        printf("3. Kembali\n");
+        printf("\nPilih opsi (1-3): ");
+        
+        if (scanf("%d", &pilihan) != 1) {
+            while (getchar() != '\n');
+            printf("Input tidak valid. Harap masukkan angka 1-3.\n");
+            continue;
+        }
+        getchar();
+
+        switch (pilihan) {
+            case 1:
+                lihat_profil(currentUser);
+                break;
+            case 2:
+                lihat_laporan_keuntungan(currentUser->username);
+                break;
+            case 3:
+                printf("Kembali ke menu utama...\n");
+                break;
+            default:
+                printf("Pilihan tidak valid.\n");
+        }
+    } while (pilihan != 3);
+}
+
+// Menu utama
+void mainMenu() {
+    int menu;
+    do
+    {
+        printf("\n==== Menu Utama ====\n");
+        printf("1. Jual Barang\n");
+        printf("2. Beli Barang\n");
+        printf("3. Riwayat Transaksi\n");
+        printf("4. Cari Barang\n");
+        printf("5. Akun Saya & Laporan\n");
+        printf("6. Logout\n");
+        printf("\nPilih menu: ");
+        if (scanf("%d", &menu) != 1) {
+            
+            while (getchar() != '\n');
+            printf("Input tidak valid! Hanya pilihan (1-6)\n");
+            continue;
+        }
+        getchar();
+
+        switch (menu) {
+        case 1:
+            sellMenu();
+            break;
+        case 2:
+            buyMenu();
+            break;
+        case 3:
+            transactionHistoryMenu();
+            break;
+        case 4:
+            searchMenu();
+            break;
+        case 5:
+            accountMenu(&currentUser);
+            break;
+        case 6:
+            printf("Logout berhasil!\n");
+            break;
+        default:
+            printf("Pilihan tidak valid.\n");
+        }
+    } while (menu != 6);
+}
