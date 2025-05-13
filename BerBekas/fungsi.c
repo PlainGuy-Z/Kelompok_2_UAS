@@ -175,3 +175,9 @@ void tampilBarangSaya() {
         printf("Anda belum menambah barang apapun.\n");
     }
 }
+
+void hapusBarang() {
+    if (head == NULL) {
+        printf("Tidak ada barang untuk dihapus.\n");
+        return;
+    }
