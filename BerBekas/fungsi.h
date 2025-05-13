@@ -33,4 +33,36 @@ typedef struct Queue {
 } Queue;
 
 
+typedef struct Transaksi {
+    char namaBarang[30];
+    int harga;
+    int tahun;
+    char penjual[30];
+    struct Transaksi *next;
+} Transaksi;
+
+void mainMenu();
+
+void loginMenu();
+int loginUser();
+void registerUser();
+
+
+//di sini  linked list ditambahin
+void tambahBarang();
+void tampilBarangSaya();
+void hapusBarang();
+void sellMenu();
+
+
+//============================ START BUY MENU ============================
+void buyMenu();
+void tampilBarang();
+
+
+void swap(Node *a, Node *b);
+int partition(Node arr[], int low, int high);
+void quickSort(Node arr[], int low, int high);
+void filterHarga();
+
 #endif
