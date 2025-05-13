@@ -365,6 +365,392 @@ void swap(Node *a, Node *b) {
 }
 // end fungsi untuk filter harga di case 2
 
+// Fungsi untuk filter tahun di case 3
+void filterTahun() {
+    Node *temp = head;
+    int count = 0;
+
+    // Hitung jumlah data
+    while (temp != NULL) {
+        if (strcmp(temp->pemilik, currentUser.username) != 0)  // Hanya barang orang lain
+            count++;
+        temp = temp->next;
+    }
+
+    if (count == 0) {
+        printf("Tidak ada barang yang tersedia dari penjual lain.\n");
+        return;
+    }
+
+    // Salin ke array
+    Node array[count];
+    temp = head;
+    int i = 0;
+    while (temp != NULL) {
+        if (strcmp(temp->pemilik, currentUser.username) != 0)
+            array[i++] = *temp;
+        temp = temp->next;
+    }
+
+    // Urutkan berdasarkan tahun
+    mergeSort(array, 0, count - 1);
+
+    // Tampilkan hasil
+    printf("\n--- Daftar Barang (Urut Tahun: Terlama ke Terbaru) ---\n");
+    for (int j = 0; j < count; j++) {
+        printf("%d. Nama : %s\n", j + 1, array[j].nama);
+        printf("   Harga: Rp%d\n", array[j].harga);
+        printf("   Tahun: %d\n", array[j].tahun);
+        printf("   Penjual: %s\n", array[j].pemilik);
+        printf("-------------------------------\n");
+    }
+}
+
+void merge(Node arr[], int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    Node L[n1], R[n2];
+
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[left + i];
+
+    for (int j = 0; j < n2; j++)
+        R[j] = arr[mid + 1 + j];
+
+    int i = 0, j = 0, k = left;
+
+    while (i < n1 && j < n2) {
+        if (L[i].tahun >= R[j].tahun) {
+            arr[k++] = L[i++];
+        } else {
+            arr[k++] = R[j++];
+        }
+    }
+
+    while (i < n1)
+        arr[k++] = L[i++];
+
+    while (j < n2)
+        arr[k++] = R[j++];
+}
+
+void mergeSort(Node arr[], int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+    }
+}
+// End Merge Sort
+
+//  fungsi untuk beli barang di case 4
+void beliBarang() {
+    if (head == NULL) {
+        printf("Tidak ada barang yang tersedia.\n");
+        return;
+    }
+
+    Node *temp = head;
+    int no = 1;
+    int found = 0;
+    char daftarNama[100][30];
+
+    printf("\n--- Daftar Barang yang Tersedia ---\n");
+    while (temp != NULL) {
+        if (strcmp(temp->pemilik, currentUser.username) != 0) { 
+            printf("%d. Nama : %s\n", no, temp->nama);
+            printf("   Harga: Rp%d\n", temp->harga);
+            printf("   Tahun: %d\n", temp->tahun);
+            printf("   Penjual: %s\n", temp->pemilik);
+            printf("--------------------------\n");
+            strcpy(daftarNama[no - 1], temp->nama);
+            no++;
+            found++;
+        }
+        temp = temp->next;
+    }
+
+    if (found == 0) {
+        printf("Tidak ada barang dari penjual lain untuk dibeli.\n");
+        return;
+    }
+
+    char target[30];
+    printf("Masukkan nama barang yang ingin dibeli: ");
+    scanf(" %[^\n]", target);
+
+    Node *curr = head;
+    Node *prev = NULL;
+
+    while (curr != NULL) {
+        if (strcmp(curr->nama, target) == 0 && strcmp(curr->pemilik, currentUser.username) != 0) { 
+            printf("\nAnda telah membeli barang \"%s\" seharga Rp%d dari %s.\n", curr->nama, curr->harga, curr->pemilik);
+            if (prev == NULL) {
+                head = curr->next;
+            } else {
+                prev->next = curr->next;
+            }
+            masukkanHistory(curr->nama, curr->harga, curr->tahun, curr->pemilik);
+            free(curr);
+            return;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+    printf("Barang tidak ditemukan atau Anda tidak bisa membeli barang sendiri.\n");
+}
+
+void tambahKeKeranjang() {
+    char namaCari[30];
+    printf("Masukkan nama barang yang ingin dimasukkan ke keranjang: ");
+    scanf(" %[^\n]", namaCari);
+
+    Node *temp = head;
+    while (temp != NULL) {
+        if (strcmp(temp->nama, namaCari) == 0 && strcmp(temp->pemilik, currentUser.username) != 0) {
+            Node *item = (Node *)malloc(sizeof(Node));
+            if (!item) {
+                printf("Gagal menambahkan ke keranjang.\n");
+                return;
+            }
+            strcpy(item->nama, temp->nama);
+            item->harga = temp->harga;
+            item->tahun = temp->tahun;
+            strcpy(item->pemilik, temp->pemilik);
+            item->next = NULL;
+
+            if (keranjang.rear == NULL) {
+                keranjang.front = keranjang.rear = item;
+            } else {
+                keranjang.rear->next = item;
+                keranjang.rear = item;
+            }
+
+            printf("Barang '%s' berhasil dimasukkan ke keranjang.\n", namaCari);
+            return;
+        }
+        temp = temp->next;
+    }
+    printf("Barang tidak ditemukan atau Anda tidak bisa membeli barang sendiri.\n");
+}
+
+void tampilkanKeranjang() {
+    if (keranjang.front == NULL) {
+        printf("Keranjang kosong.\n");
+        return;
+    }
+    Node *temp = keranjang.front;
+    int i = 1;
+    printf("\n--- Isi Keranjang Anda ---\n");
+    while (temp != NULL) {
+        printf("%d. Nama     : %s\n", i++, temp->nama);
+        printf(" Harga      : Rp%d\n", temp->harga);
+        printf(" Tahun      : %d\n", temp->tahun);
+        printf(" Penjual    : %s\n", temp->pemilik);
+        printf("---------------------------\n");
+        temp = temp->next;
+    }
+}
+
+void prosesKeranjang() {
+    if (keranjang.front == NULL) {
+        printf("Keranjang kosong. Tidak ada barang untuk diproses.\n");
+        return;
+    }
+    Node *curr = keranjang.front;
+    while (curr != NULL) {
+        printf("Membeli '%s' seharga Rp%d dari %s...\n", curr->nama, curr->harga, curr->pemilik);
+        masukkanHistory(curr->nama, curr->harga, curr->tahun, curr->pemilik);
+
+        // Hapus dari daftar barang utama
+        Node *ptr = head, *prev = NULL;
+        while (ptr != NULL) {
+            if (strcmp(ptr->nama, curr->nama) == 0 && strcmp(ptr->pemilik, curr->pemilik) == 0) {
+                if (prev == NULL) head = ptr->next;
+                else prev->next = ptr->next;
+                free(ptr);
+                break;
+            }
+            prev = ptr;
+            ptr = ptr->next;
+        }
+        Node *hapus = curr;
+        curr = curr->next;
+        free(hapus);
+    }
+    keranjang.front = keranjang.rear = NULL;
+    printf("\nSemua barang di keranjang telah dibeli.\n");
+}
+
+void masukkanHistory(const char *nama, int harga, int tahun, const char *penjual) {
+    Transaksi *baru = (Transaksi *)malloc(sizeof(Transaksi));
+    if (baru == NULL) {
+        printf("Gagal menyimpan riwayat transaksi.\n");
+        return;
+    }
+
+    strcpy(baru->namaBarang, nama);
+    strcpy(baru->penjual, penjual);
+    baru->harga = harga;
+    baru->tahun = tahun;
+    baru->next = top;
+    top = baru;
+
+    printf("Transaksi berhasil dicatat dalam riwayat.\n");
+}
+
+// ============================ END BUY MENU ============================
+
+void transactionHistoryMenu(){
+    int choice;
+    while(1) {
+    printf("\n--- Riwayat Transaksi ---\n");
+    printf("1. Tampilkan Riwayat\n");
+    printf("2. Undo Transaksi Terakhir\n");
+    printf("3. Kembali\n");
+    printf("\nPilih opsi: ");
+    scanf("%d", &choice);
+
+    switch (choice){
+        case 1:
+            if(top == NULL){
+                printf("\nBelum ada riwayat transaksi\n");
+        
+            }else {
+                printf("\n===== Riwayat Transaksi Anda ====\n");
+                Transaksi* temp = top;
+                int no = 1;
+                while (temp != NULL){
+                    printf("%d. Nama Barang  : %s\n", no++, temp->namaBarang);
+                    printf("   Harga        : Rp%d\n", temp->harga);
+                    printf("   Tahun        : %d\n", temp->tahun);
+                    printf("   Penjual      : %s\n", temp->penjual);
+                    printf("----------------------------------\n");
+                    temp = temp->next;  
+                }
+            }
+            break;
+
+        case 2:
+            if(top == NULL) {
+                printf("\nTidak ada transaksi yang bisa di-undo\n");
+            }else {
+                Transaksi* temp = top;
+                top = top->next;
+                free(temp);
+                printf("\nTransaksi terakhir berhasil di undo\n");
+            }
+            break;
+
+        case 3:
+            printf("Kembali ke menu utama\n");
+            return;
+        default:
+            printf("Opsi tidak valid, silakan coba lagi\n");
+            break;
+        }
+    }
+}
+
+// =======================Menu Pencarian & Sort (BST, Quick, Merge) ========================
+void searchMenu() {
+    int pilihan;
+
+    do {
+        printf("\n--- Cari Barang ---\n");
+        printf("1. Cari Berdasarkan Nama\n");
+        printf("2. Cari Berdasarkan Harga\n");
+        printf("3. Urutkan Harga (Quick Sort)\n");
+        printf("4. Urutkan Tahun (Merge Sort)\n");
+        printf("5. Tampilkan Harga Tertinggi/Terendah (Heap)\n");
+        printf("6. Kembali\n");
+        printf("\nPilih menu: ");
+        if (scanf("%d", &pilihan) != 1) {
+            
+            while (getchar() != '\n');
+            printf("Input tidak valid! Hanya pilihan (1-6)\n");
+            continue;
+        }
+        getchar();
+        switch (pilihan) {
+            case 1:
+                cariBerdasarkanNama();
+                break;
+            case 2:
+                cariBerdasarkanHarga();
+                break;
+            case 3:
+                urutkanHargaQuickSort();
+                break;
+            case 4:
+                urutkanTahunMergeSort();
+                break;
+            case 5:
+                tampilkanHargaTertinggiTerendah();
+                break;
+            case 6:
+                printf("Kembali ke menu utama.\n");
+                break;
+            default:
+                printf("Input tidak valid! Hanya pilihan (1-6)\n");
+        }
+
+    } while (pilihan != 6);
+
+}
+
+void cariBerdasarkanNama() {
+    char keyword[30];
+    printf("Masukkan nama barang yang ingin dicari: ");
+    scanf(" %[^\n]", keyword);
+
+    Node *temp = head;
+    bool ditemukan = false;
+    int no = 1;
+    while (temp != NULL) {
+        if (strstr(temp->nama, keyword) != NULL) {
+            printf("%d. Nama     : %s\n", no++, temp->nama);
+            printf("  Harga     : Rp%d\n", temp->harga);
+            printf("  Tahun     : %d\n", temp->tahun);
+            printf("  Penjual   : %s\n", temp->pemilik);
+            printf("-------------------------\n");
+            ditemukan = true;
+        }
+        temp = temp->next;
+    }
+    if (!ditemukan) {
+        printf("Barang dengan kata kunci '%s' tidak ditemukan.\n", keyword);
+    }
+}
+
+void cariBerdasarkanHarga() {
+    int hargaCari;
+    printf("Masukkan harga barang yang ingin dicari: ");
+    scanf("%d", &hargaCari);
+
+    Node *temp = head;
+    bool ditemukan = false;
+    int no = 1;
+    while (temp != NULL) {
+        if (temp->harga == hargaCari) {
+            printf("%d. Nama     : %s\n", no++, temp->nama);
+            printf("  Harga     : Rp%d\n", temp->harga);
+            printf("   Tahun    : %d\n", temp->tahun);
+            printf("   Penjual  : %s\n", temp->pemilik);
+            printf("-------------------------\n");
+            ditemukan = true;
+        }
+        temp = temp->next;
+    }
+    if (!ditemukan) {
+        printf("Barang dengan harga Rp%d tidak ditemukan.\n", hargaCari);
+    }
+}
+
+
 void urutkanHargaQuickSort() {
     Node *temp = head;
     int count = 0;
